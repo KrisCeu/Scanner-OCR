@@ -1,5 +1,6 @@
 package com.my.application;
 
+import android.content.Intent;
 import android.Manifest;
 import android.content.ClipData;
 import android.content.ClipboardManager;
@@ -54,9 +55,10 @@ public class MainActivity extends AppCompatActivity {
 
     private PreviewView previewView;
     private TextView txtResult;
-    private MaterialButton btnToggleScan, btnCopy;
+    private MaterialButton btnToggleScan, btnCopy, btnShare;
     private View focusAreaView;
     private FloatingActionButton btnFlash;
+
 
     private ExecutorService cameraExecutor;
     private boolean isScanning = true;
@@ -77,6 +79,7 @@ public class MainActivity extends AppCompatActivity {
         txtResult = findViewById(R.id.txtResult);
         btnToggleScan = findViewById(R.id.btnToggleScan);
         btnCopy = findViewById(R.id.btnCopy);
+        btnShare = findViewById(R.id.btnShare);
         focusAreaView = findViewById(R.id.focusArea);
         btnFlash = findViewById(R.id.btnFlash);
 
@@ -123,6 +126,25 @@ public class MainActivity extends AppCompatActivity {
             ClipData clip = ClipData.newPlainText("Texto OCR", texto);
             clipboard.setPrimaryClip(clip);
             Toast.makeText(this, "Copiado!", Toast.LENGTH_SHORT).show();
+        });
+
+        // Lógica do botão de Compartilhar
+        btnShare.setOnClickListener(v -> {
+            String texto = txtResult.getText().toString();
+
+            // Verifica se tem algo para compartilhar
+            if (texto.isEmpty() || texto.equals("Escaneando...")) {
+                Toast.makeText(this, "Nenhum texto para enviar", Toast.LENGTH_SHORT).show();
+                return;
+            }
+
+            // Cria a "Intenção" de enviar um texto simples
+            Intent shareIntent = new Intent(Intent.ACTION_SEND);
+            shareIntent.setType("text/plain");
+            shareIntent.putExtra(Intent.EXTRA_TEXT, texto);
+
+            // Abre a gaveta do Android para o usuário escolher o app (WhatsApp, Email, etc)
+            startActivity(Intent.createChooser(shareIntent, "Enviar texto via..."));
         });
     }
 
